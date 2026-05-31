@@ -242,6 +242,8 @@
     .nav-links a { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
     .hamburger { display: flex; }
     .nav-cta { display: none !important; }
+    body.lang-tr a.nav-cta[data-lang="tr"] { display: none !important; }
+    body a.nav-cta { display: none !important; }
     .lang-toggle { display: flex; }
     .lang-toggle button { padding: 5px 9px; font-size: 11px; }
     .lang-toggle-mobile { display: none; }
@@ -381,8 +383,7 @@
         <div class="sep"></div>
         <button id="btnTR" onclick="setLang('tr')">TR</button>
       </div>
-      <a href="#contact" class="nav-cta" data-lang="en">Contact</a>
-      <a href="#contact" class="nav-cta" data-lang="tr">İLETİŞİM</a>
+      <a href="#contact" class="nav-cta" id="navCta">Contact</a>
       <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -918,8 +919,7 @@
         </div>
         <button type="submit" class="form-submit" data-lang="en">Send Message</button>
         <button type="submit" class="form-submit" data-lang="tr">MESAJ GÖNDER</button>
-        <p id="formSuccess" style="display:none;color:rgba(255,255,255,0.8);margin-top:16px;font-size:14px;" data-lang="en">✓ Message sent successfully!</p>
-        <p id="formSuccess" style="display:none;color:rgba(255,255,255,0.8);margin-top:16px;font-size:14px;" data-lang="tr">✓ Mesajınız gönderildi!</p>
+        <p id="formSuccess" style="display:none;color:rgba(255,255,255,0.8);margin-top:16px;font-size:14px;">✓ <span id="formSuccessText">Message sent successfully!</span></p>
       </form>
       </div>
     </div>
@@ -944,6 +944,10 @@
     var mTR = document.getElementById('btnTR_m');
     if (mEN) mEN.classList.toggle('active', lang === 'en');
     if (mTR) mTR.classList.toggle('active', lang === 'tr');
+    var cta = document.getElementById('navCta');
+    if (cta) cta.textContent = lang === 'tr' ? 'İLETİŞİM' : 'Contact';
+    var st = document.getElementById('formSuccessText');
+    if (st) st.textContent = lang === 'tr' ? 'Mesajınız gönderildi!' : 'Message sent successfully!';
   }
   document.getElementById('hamburger').addEventListener('click', function() {
     document.getElementById('navLinks').classList.toggle('open');
