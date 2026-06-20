@@ -474,11 +474,6 @@
     </div>
     <div class="hero-diagram" aria-hidden="true">
       <canvas id="sphereCanvas"></canvas>
-      <div class="hero-diagram-cap">
-        <span class="hdc-dot"></span>
-        <span data-lang="en">Drag to rotate · disciplines assembling into one</span>
-        <span data-lang="tr">DÖNDÜRMEK İÇİN SÜRÜKLEYİN · DİSİPLİNLER TEK KÜREDE</span>
-      </div>
     </div>
   </div>
   <div class="hero-stats">
@@ -1011,196 +1006,77 @@
       W=r.width; H=r.height;
       canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
       ctx.setTransform(DPR,0,0,DPR,0,0);
-      cx=W/2; cy=H/2; Rs=Math.min(W,H)*0.38;
+      cx=W/2; cy=H/2; Rs=Math.min(W,H)*0.40;
     }
-    // ---------- math ----------
-    var D2R=Math.PI/180;
-    function sph(lat,lon){ var cl=Math.cos(lat); return [cl*Math.sin(lon), Math.sin(lat), cl*Math.cos(lon)]; }
-    function nrmz(v){ var m=Math.hypot(v[0],v[1],v[2])||1; return [v[0]/m,v[1]/m,v[2]/m]; }
-    function cross(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
-    var seed=23;
+    // ---------- abstract node-sphere: points gather in, faint links, slow spin ----------
+    var N=150, GOLD=Math.PI*(3-Math.sqrt(5));
+    var nodes=[], seed=7;
     function rnd(){ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; }
-    function sgn(){ return rnd()<0.5?-1:1; }
-    // ---------- jigsaw geometry (fewer, larger pieces) ----------
-    var latB=[-90,-38,0,38,90].map(function(d){return d*D2R;});
-    var NLAT=latB.length-1, NLON=9;
-    function lonAt(k){ return k/NLON*2*Math.PI; }
-    var Hs=[], Vs=[];
-    for(var g=0; g<=NLAT; g++){ Hs[g]=[]; for(var l=0;l<NLON;l++) Hs[g][l]=(g===0||g===NLAT)?0:sgn(); }
-    for(var vi=0; vi<NLON; vi++){ Vs[vi]=[]; for(var b=0;b<NLAT;b++) Vs[vi][b]=sgn(); }
-    // classic puzzle tab: pinched neck + round bulb wider than the neck (true undercut)
-    function cubic(p0,p1,p2,p3,seg,out){
-      for(var i=1;i<=seg;i++){ var t=i/seg, m=1-t;
-        out.push([ m*m*m*p0[0]+3*m*m*t*p1[0]+3*m*t*t*p2[0]+t*t*t*p3[0],
-                   m*m*m*p0[1]+3*m*m*t*p1[1]+3*m*t*t*p2[1]+t*t*t*p3[1] ]); }
+    for(var i=0;i<N;i++){
+      var y=1-(i+0.5)/N*2, rad=Math.sqrt(Math.max(0,1-y*y)), th=GOLD*i;
+      var base=[Math.cos(th)*rad, y, Math.sin(th)*rad];
+      // scattered start position (further out, random)
+      var sx=base[0]*(1.7+rnd()*1.4)+(rnd()-0.5)*0.9;
+      var sy=base[1]*(1.7+rnd()*1.4)+(rnd()-0.5)*0.9;
+      var sz=base[2]*(1.7+rnd()*1.4)+(rnd()-0.5)*0.9;
+      nodes.push({b:base, s:[sx,sy,sz], r:0.7+rnd()*1.6, order: (1-(y+1)/2), delay: rnd()*0.5});
     }
-    // classic jigsaw tab: straight shoulders, pinched neck, bulb that overhangs the neck (mushroom)
-    function buildKnob(Lr, sign){
-      var pts=[[0,0]], i;
-      if(!sign || Lr<1e-6){ var NB=10; pts=[]; for(i=0;i<=NB;i++) pts.push([Lr*i/NB,0]); return pts; }
-      var A=0.26*Lr; // bulb height
-      // x along edge (fraction of Lr): neck base 0.41..0.59, bulb overhang 0.27..0.73
-      var nL=0.41*Lr, nR=0.59*Lr, bL=0.27*Lr, bR=0.73*Lr;
-      var ns=4; for(i=1;i<=ns;i++) pts.push([nL*i/ns,0]);                              // left shoulder
-      cubic([nL,0],      [nL,0.34*A],  [bL,0.28*A],  [bL,0.64*A], 7, pts);             // neck up + overhang out (left)
-      cubic([bL,0.64*A], [bL-0.02*Lr,1.05*A], [bR+0.02*Lr,1.05*A], [bR,0.64*A], 11, pts); // over the bulb
-      cubic([bR,0.64*A], [bR,0.28*A],  [nR,0.34*A],  [nR,0], 7, pts);                  // overhang in + neck down (right)
-      for(i=1;i<=ns;i++) pts.push([nR+(Lr-nR)*i/ns,0]);                                // right shoulder
-      if(sign<0) for(i=0;i<pts.length;i++) pts[i][1]=-pts[i][1];
-      return pts;
-    }
-    function hEdge(gi,li){ var bl=latB[gi], lo0=lonAt(li), lo1=lonAt(li+1), clat=Math.max(0.12,Math.cos(bl)), Lr=(lo1-lo0)*clat;
-      return buildKnob(Lr, Hs[gi][li]).map(function(p){ return sph(bl+p[1], lo0+(p[0]/Lr)*(lo1-lo0)); }); }
-    function vEdge(vix,bi){ var bL=lonAt(vix), la0=latB[bi], la1=latB[bi+1], Lr=(la1-la0);
-      return buildKnob(Lr, Vs[vix][bi]).map(function(p){ var lat=la0+(p[0]/Lr)*(la1-la0); return sph(lat, bL+p[1]/Math.max(0.45,Math.cos(lat))); }); }
-    function rev(a){ return a.slice().reverse(); }
-    var tiles=[];
-    for(var bi=0; bi<NLAT; bi++){
-      var la0=latB[bi], la1=latB[bi+1];
-      for(var li=0; li<NLON; li++){
-        var pts=hEdge(bi,li).concat(vEdge((li+1)%NLON,bi).slice(1), rev(hEdge(bi+1,li)).slice(1), rev(vEdge(li,bi)).slice(1));
-        var c=sph((la0+la1)/2,(lonAt(li)+lonAt(li+1))/2);
-        var scatter=nrmz([c[0]+ (rnd()*2-1)*1.1, c[1]+(rnd()*1.4-0.2), c[2]+(rnd()*2-1)*1.1]);
-        var tang=cross(c,[0,1,0]); if(Math.hypot(tang[0],tang[1],tang[2])<1e-3) tang=[1,0,0]; tang=nrmz(tang);
-        var midlat=(la0+la1)/2, lonw=(lonAt(li+1)-lonAt(li))*Math.cos(midlat);
-        var iconF=Math.max(0.085, 0.72*0.5*Math.min(la1-la0, Math.abs(lonw))); // fit icon to this tile (poles get smaller)
-        var gu=cross([0,1,0],c); if(Math.hypot(gu[0],gu[1],gu[2])<1e-4) gu=[1,0,0]; gu=nrmz(gu);
-        var gv=nrmz(cross(c,gu)); // tangent-plane basis at tile centre (constant per tile)
-        tiles.push({pts:pts, c:c, icon:(bi*NLON+li)%7, order:0, dir:scatter, far:2.0+rnd()*1.6, tang:tang, swirl:(rnd()*2-1)*0.8, spin0:(rnd()*2-1)*0.6, iconF:iconF, gu:gu, gv:gv});
-      }
-    }
-    tiles.slice().sort(function(a,b){return a.c[1]-b.c[1];}).forEach(function(t,i){t.order=i;});
-    var NT=tiles.length;
-    // ---------- bold industrial glyphs (filled silhouettes) ----------
-    // glyphs as normalized point-lists ([-1..1] units) so they can be PROJECTED onto the sphere surface
-    function arcPts(cx0,cy0,r,a0,a1,seg){ var p=[]; for(var i=0;i<=seg;i++){ var a=a0+(a1-a0)*i/seg; p.push([cx0+Math.cos(a)*r, cy0+Math.sin(a)*r]); } return p; }
-    function bzPts(p0,p1,p2,p3,seg){ var p=[]; for(var i=0;i<=seg;i++){ var t=i/seg, m=1-t; var x=m*m*m*p0[0]+3*m*m*t*p1[0]+3*m*t*t*p2[0]+t*t*t*p3[0]; var y=m*m*m*p0[1]+3*m*m*t*p1[1]+3*m*t*t*p2[1]+t*t*t*p3[1]; p.push([x,y]); } return p; }
-    function buildGlyph(n){
-      var S=[]; // each: {pts, holes, closed, fill, lw}
-      function add(pts,o){ o=o||{}; S.push({pts:pts, holes:o.holes||null, closed:o.closed!==false, fill:!!o.fill, lw:o.lw||0}); }
-      if(n===0){ // STEEL — I-beam section (filled)
-        var fw=0.95, ft=0.26, wt=0.2;
-        add([[-fw,-1],[fw,-1],[fw,-1+ft],[wt,-1+ft],[wt,1-ft],[fw,1-ft],[fw,1],[-fw,1],[-fw,1-ft],[-wt,1-ft],[-wt,-1+ft],[-fw,-1+ft]],{fill:true});
-      } else if(n===1){ // CIVIL — reinforced-concrete column section (rebars + tie)
-        add([[-0.9,-0.9],[0.9,-0.9],[0.9,0.9],[-0.9,0.9]],{lw:0.17});            // concrete outline
-        var st=0.6;
-        add([[-st,-st],[st,-st],[st,st],[-st,st]],{lw:0.1});                     // stirrup / tie
-        var br=0.18;
-        [[-st,-st],[st,-st],[-st,st],[st,st],[0,-st],[0,st]].forEach(function(p){ add(arcPts(p[0],p[1],br,0,2*Math.PI,12),{fill:true}); }); // longitudinal rebars
-      } else if(n===2){ // PIPING — flanged spool with gate valve & handwheel
-        var y0=0.3;
-        add([[-1,y0],[-0.4,y0]],{closed:false,lw:0.2});                          // left pipe run
-        add([[0.4,y0],[1,y0]],{closed:false,lw:0.2});                            // right pipe run
-        add([[-0.96,y0-0.26],[-0.96,y0+0.26]],{closed:false,lw:0.1});            // left flange pair
-        add([[-0.84,y0-0.21],[-0.84,y0+0.21]],{closed:false,lw:0.1});
-        add([[0.96,y0-0.26],[0.96,y0+0.26]],{closed:false,lw:0.1});              // right flange pair
-        add([[0.84,y0-0.21],[0.84,y0+0.21]],{closed:false,lw:0.1});
-        add([[-0.4,y0-0.34],[-0.4,y0+0.34],[0,y0]],{fill:true});                 // gate-valve body (bowtie)
-        add([[0.4,y0-0.34],[0.4,y0+0.34],[0,y0]],{fill:true});
-        add([[0,y0],[0,-0.46]],{closed:false,lw:0.1});                           // valve stem
-        add(arcPts(0,-0.6,0.36,0,2*Math.PI,16).map(function(p){ return [p[0], -0.6+(p[1]+0.6)*0.46]; }),{lw:0.11}); // handwheel
-        add([[-0.36,-0.6],[0.36,-0.6]],{closed:false,lw:0.08});                   // wheel spoke
-      } else if(n===3){ // ELECTRICAL — lightning bolt (filled)
-        add([[0.2,-1],[-0.5,0.12],[-0.04,0.12],[-0.28,1],[0.55,-0.18],[0.05,-0.18]],{fill:true});
-      } else if(n===4){ // MECHANICAL — two meshing gears
-        function gear(gx,gy,ro,ri,teeth){ var o=[]; for(var t=0;t<teeth;t++){ var a=t/teeth*2*Math.PI, w=0.2, a2=(t+1)/teeth*2*Math.PI;
-          o.push([gx+Math.cos(a-w)*ri,gy+Math.sin(a-w)*ri],[gx+Math.cos(a-w*0.55)*ro,gy+Math.sin(a-w*0.55)*ro],[gx+Math.cos(a+w*0.55)*ro,gy+Math.sin(a+w*0.55)*ro],[gx+Math.cos(a+w)*ri,gy+Math.sin(a+w)*ri],[gx+Math.cos(a2-w)*ri,gy+Math.sin(a2-w)*ri]); } return o; }
-        add(gear(-0.3,-0.14,0.68,0.5,9), {fill:true, holes:[arcPts(-0.3,-0.14,0.23,0,2*Math.PI,14)]}); // large gear
-        add(gear(0.5,0.46,0.46,0.33,7), {fill:true, holes:[arcPts(0.5,0.46,0.15,0,2*Math.PI,12)]});    // small gear meshing
-      } else if(n===5){ // INSTRUMENTATION — gauge dial
-        add(arcPts(0,0,0.9,0,2*Math.PI,28),{lw:0.13});
-        for(var k=0;k<8;k++){ var a=Math.PI*0.75+k/7*Math.PI*1.5; add([[Math.cos(a)*0.9,Math.sin(a)*0.9],[Math.cos(a)*0.7,Math.sin(a)*0.7]],{closed:false,lw:0.1}); }
-        add([[0,0],[Math.cos(-Math.PI*0.15)*0.72,Math.sin(-Math.PI*0.15)*0.72]],{closed:false,lw:0.16});
-        add(arcPts(0,0,0.16,0,2*Math.PI,12),{fill:true});
-      } else { // PROCESS — vessel / storage tank
-        var w=0.6, top=-0.78, bot=0.86, e=0.2;
-        var body=[[-w,top]].concat(bzPts([-w,top],[-w,top+e],[w,top+e],[w,top],10), [[w,bot]], bzPts([w,bot],[w,bot+e],[-w,bot+e],[-w,bot],10), [[-w,top]]);
-        add(body,{lw:0.13});
-        add(bzPts([-w,top],[-w,top+e],[w,top+e],[w,top],10),{closed:false,lw:0.13});
-        add(bzPts([-w,0.22],[-w*0.6,0.08],[w*0.6,0.36],[w,0.22],10),{closed:false,lw:0.12});
-      }
-      return S;
-    }
-    var glyphCache={}; function getGlyph(n){ return glyphCache[n] || (glyphCache[n]=buildGlyph(n)); } // build each glyph once
-    // ---------- timing / interaction (slow, deliberate gather) ----------
+    // precompute near-neighbour links (short arcs only) once
+    var links=[];
+    for(var a=0;a<N;a++){ for(var c2=a+1;c2<N;c2++){
+      var d0=nodes[a].b, d1=nodes[c2].b;
+      var dot=d0[0]*d1[0]+d0[1]*d1[1]+d0[2]*d1[2];
+      if(dot>0.86) links.push([a,c2,(dot-0.86)/0.14]); // closeness 0..1
+    }}
+    // ---------- timing / interaction ----------
     var lastT=performance.now()/1000;
-    var assemblyStart=lastT+0.7, DUR=2.0, STAG=0.085, TILT=-18*D2R;
-    var IDLE=reduced?0:0.14, spin=0, spinVel=IDLE*0.4, dragging=false, lastX=0;
+    var start=lastT+0.3, DUR=1.6, STAG=1.1, TILT=-16*Math.PI/180;
+    var IDLE=reduced?0:0.12, spin=0, spinVel=IDLE, dragging=false, lastX=0;
     function easeInOut(x){ return x<=0?0:x>=1?1:x*x*x*(x*(x*6-15)+10); }
+    var rp=new Float64Array(N*3), sc=new Float64Array(N), al=new Float64Array(N);
     function frame(now){
       var t=now/1000, dt=Math.min(0.05,t-lastT); lastT=t;
-      var prog=Math.min(1,Math.max(0,(t-assemblyStart)/(DUR+NT*STAG)));
-      if(!dragging) spinVel += ((IDLE*(0.3+0.7*prog))-spinVel)*Math.min(1,dt*1.4);
+      if(!dragging) spinVel += (IDLE-spinVel)*Math.min(1,dt*1.5);
       spin += spinVel*dt;
-      var cs=Math.cos(spin), ss=Math.sin(spin), ctil=Math.cos(TILT), stil=Math.sin(TILT);
-      function rot(p){ var x=p[0]*cs+p[2]*ss, z=-p[0]*ss+p[2]*cs, y=p[1]; return [x, y*ctil-z*stil, y*stil+z*ctil]; }
+      var cs=Math.cos(spin), ss=Math.sin(spin), ct=Math.cos(TILT), st=Math.sin(TILT);
       ctx.clearRect(0,0,W,H);
-      ctx.save(); ctx.strokeStyle='rgba(68,52,89,0.14)'; ctx.lineWidth=1; ctx.setLineDash([2,5]);
-      ctx.beginPath(); ctx.arc(cx,cy,Rs*1.1,0,2*Math.PI); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
-      var draw=[], i;
-      for(i=0;i<NT;i++){
-        var tl=tiles[i];
-        var lt=reduced?1:(t-assemblyStart-tl.order*STAG)/DUR; lt=lt<0?0:(lt>1?1:lt);
+      // faint construction ring
+      ctx.strokeStyle='rgba(68,52,89,0.10)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(cx,cy,Rs,0,2*Math.PI); ctx.stroke();
+      for(var i=0;i<N;i++){
+        var nd=nodes[i];
+        var lt=reduced?1:(t-start-nd.order*STAG-nd.delay)/DUR; lt=lt<0?0:(lt>1?1:lt);
         var e=easeInOut(lt), inv=1-e;
-        var ox=(tl.dir[0]*tl.far + tl.tang[0]*tl.swirl)*inv;
-        var oy=(tl.dir[1]*tl.far + tl.tang[1]*tl.swirl)*inv;
-        var oz=(tl.dir[2]*tl.far + tl.tang[2]*tl.swirl)*inv;
-        var scp=0.45+0.55*e, alpha=Math.min(1,lt*2.6), tw=tl.spin0*inv;
-        var rc=rot(tl.c), cc=rot([tl.c[0]+ox,tl.c[1]+oy,tl.c[2]+oz]);
-        draw.push({tl:tl,ox:ox,oy:oy,oz:oz,scp:scp,alpha:alpha,tw:tw,nx:rc[0],ny:rc[1],nz:rc[2],cz:cc[2],ccx:cx+cc[0]*Rs,ccy:cy-cc[1]*Rs,rot:rot});
+        var x=nd.b[0]+(nd.s[0]-nd.b[0])*inv, y=nd.b[1]+(nd.s[1]-nd.b[1])*inv, z=nd.b[2]+(nd.s[2]-nd.b[2])*inv;
+        var rx=x*cs+z*ss, rz=-x*ss+z*cs, ry=y;
+        var fx=rx, fy=ry*ct-rz*st, fz=ry*st+rz*ct;
+        rp[i*3]=cx+fx*Rs; rp[i*3+1]=cy-fy*Rs; rp[i*3+2]=fz;
+        sc[i]=sc[i]; al[i]=Math.min(1,lt*1.8);
+        sc[i]=fz; // store depth for shading
       }
-      draw.sort(function(a,b){return a.cz-b.cz;});
-      for(var d=0; d<draw.length; d++){
-        var o=draw[d]; if(o.alpha<=0) continue;
-        var tl=o.tl, c=tl.c, P=[], minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9, p;
-        var ctw=Math.cos(o.tw), stw=Math.sin(o.tw);
-        for(p=0;p<tl.pts.length;p++){
-          var pp=tl.pts[p];
-          var lx=(pp[0]-c[0])*o.scp, ly=(pp[1]-c[1])*o.scp, lz=(pp[2]-c[2])*o.scp;
-          var rx=lx*ctw - lz*stw, rz=lx*stw + lz*ctw;
-          var rp=o.rot([c[0]+rx+o.ox, c[1]+ly+o.oy, c[2]+rz+o.oz]);
-          var sx=cx+rp[0]*Rs, sy=cy-rp[1]*Rs; P.push(sx,sy);
-          if(sx<minx)minx=sx; if(sx>maxx)maxx=sx; if(sy<miny)miny=sy; if(sy>maxy)maxy=sy;
-        }
-        function tracePath(){ ctx.beginPath(); for(var q=0;q<P.length;q+=2){ if(q===0) ctx.moveTo(P[q],P[q+1]); else ctx.lineTo(P[q],P[q+1]); } ctx.closePath(); }
-        function cl(x){ x=x|0; return x<0?0:x>255?255:x; }
-        var Lx=-0.34,Ly=0.60,Lz=0.72;
-        var diff=Math.max(0, o.nx*Lx+o.ny*Ly+o.nz*Lz), shade=0.70+0.46*diff;
-        var R0=243,G0=240,B0=234, A=o.alpha.toFixed(3);
-        // depth: flat offset dark copy behind the face (no blur — cheap)
-        ctx.save(); ctx.translate(2.2*o.scp,3.0*o.scp); tracePath(); ctx.fillStyle='rgba(26,16,38,'+(0.16*o.alpha).toFixed(3)+')'; ctx.fill(); ctx.restore();
-        // curved face: one linear gradient for the rounded sheen
-        var pr=0.5*Math.max(maxx-minx,maxy-miny)+1.4, sdx=-0.52, sdy=-0.64;
-        var grad=ctx.createLinearGradient(o.ccx+sdx*pr,o.ccy+sdy*pr,o.ccx-sdx*pr,o.ccy-sdy*pr);
-        grad.addColorStop(0,'rgba('+cl(R0*shade*1.07)+','+cl(G0*shade*1.07)+','+cl(B0*shade*1.05)+','+A+')');
-        grad.addColorStop(1,'rgba('+cl(R0*shade*0.78)+','+cl(G0*shade*0.78)+','+cl(B0*shade*0.81)+','+A+')');
-        tracePath(); ctx.fillStyle=grad; ctx.fill();
-        // raised edge: one offset highlight stroke (no clip) + crisp seam
-        ctx.lineJoin='round';
-        ctx.save(); ctx.translate(0.9,1.1); tracePath(); ctx.lineWidth=Math.max(1.2,2.2*o.scp); ctx.strokeStyle='rgba(255,253,247,'+(0.4*o.alpha).toFixed(3)+')'; ctx.stroke(); ctx.restore();
-        tracePath(); ctx.lineWidth=Math.max(1,1.2*o.scp);
-        ctx.strokeStyle = o.nz>0 ? 'rgba(120,72,120,'+((0.38+0.34*o.nz)*o.alpha).toFixed(3)+')' : 'rgba(70,48,92,'+(0.22*o.alpha).toFixed(3)+')';
-        ctx.stroke();
-        if(o.nz>0.18 && o.alpha>0.7){
-          // PROJECT the glyph onto the sphere's tangent surface so it curves with the globe
-          var ux=tl.gu[0],uy=tl.gu[1],uz=tl.gu[2], vx=tl.gv[0],vy=tl.gv[1],vz=tl.gv[2];
-          var F=tl.iconF; // tangent extent fitted to this tile
-          var ico=(0.4+0.6*Math.min(1,(o.nz-0.18)/0.6))*o.alpha;
-          var col='rgba(154,53,118,'+ico.toFixed(3)+')';
-          var pxPerUnit=F*Rs*o.scp;
-          function proj(gx,gy){
-            var bx=c[0]+(ux*gx+vx*gy)*F, by=c[1]+(uy*gx+vy*gy)*F, bz=c[2]+(uz*gx+vz*gy)*F;
-            var m=Math.sqrt(bx*bx+by*by+bz*bz)||1, s=1.004/m; bx*=s; by*=s; bz*=s; // back onto sphere => curvature
-            var lx=(bx-c[0])*o.scp, ly=(by-c[1])*o.scp, lz=(bz-c[2])*o.scp;
-            var rx=lx*ctw-lz*stw, rz=lx*stw+lz*ctw;
-            var rp=o.rot([c[0]+rx+o.ox, c[1]+ly+o.oy, c[2]+rz+o.oz]);
-            return [cx+rp[0]*Rs, cy-rp[1]*Rs];
-          }
-          function trace(pts){ for(var i=0;i<pts.length;i++){ var s=proj(pts[i][0],pts[i][1]); if(i===0)ctx.moveTo(s[0],s[1]); else ctx.lineTo(s[0],s[1]); } }
-          var subs=getGlyph(tl.icon);
-          ctx.lineJoin='round'; ctx.lineCap='round'; ctx.strokeStyle=col; ctx.fillStyle=col;
-          for(var gi=0; gi<subs.length; gi++){ var sub=subs[gi]; ctx.beginPath(); trace(sub.pts); if(sub.closed) ctx.closePath(); if(sub.holes){ for(var hh=0; hh<sub.holes.length; hh++){ trace(sub.holes[hh]); ctx.closePath(); } } if(sub.fill){ ctx.fill('evenodd'); } else { ctx.lineWidth=Math.max(1.0, sub.lw*pxPerUnit); ctx.stroke(); } }
-        }
+      // links (draw under nodes)
+      for(var k=0;k<links.length;k++){
+        var L=links[k], ia=L[0], ib=L[1];
+        var aa=al[ia], ab=al[ib]; if(aa<=0.02||ab<=0.02) continue;
+        var za=rp[ia*3+2], zb=rp[ib*3+2], depth=(za+zb)*0.5;
+        var op=(0.04+0.16*L[2])*Math.min(aa,ab)*(0.45+0.55*(depth*0.5+0.5));
+        ctx.strokeStyle='rgba(154,53,118,'+op.toFixed(3)+')';
+        ctx.lineWidth=depth>0?1:0.7;
+        ctx.beginPath(); ctx.moveTo(rp[ia*3],rp[ia*3+1]); ctx.lineTo(rp[ib*3],rp[ib*3+1]); ctx.stroke();
+      }
+      // nodes (sorted back-to-front)
+      var idx=[]; for(i=0;i<N;i++) idx.push(i);
+      idx.sort(function(p,q){ return rp[p*3+2]-rp[q*3+2]; });
+      for(var j=0;j<N;j++){
+        i=idx[j]; var a=al[i]; if(a<=0.02) continue;
+        var depth=rp[i*3+2], front=depth*0.5+0.5;
+        var rr=nodes[i].r*(0.7+0.5*front);
+        // halo
+        ctx.fillStyle='rgba(154,53,118,'+(0.10*a*front).toFixed(3)+')';
+        ctx.beginPath(); ctx.arc(rp[i*3],rp[i*3+1],rr*2.6,0,2*Math.PI); ctx.fill();
+        // core
+        ctx.fillStyle = depth>0 ? 'rgba(154,53,118,'+(0.55+0.4*front).toFixed(3)+')' : 'rgba(68,52,89,'+(0.3*a).toFixed(3)+')';
+        ctx.globalAlpha=a; ctx.beginPath(); ctx.arc(rp[i*3],rp[i*3+1],rr,0,2*Math.PI); ctx.fill(); ctx.globalAlpha=1;
       }
       requestAnimationFrame(frame);
     }
