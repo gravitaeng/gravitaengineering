@@ -918,10 +918,9 @@
     if (st) st.textContent = tr ? 'Mesajınız gönderildi!' : 'Message sent successfully!';
     try { localStorage.setItem('gravita_lang', lang); } catch(_) {}
   }
-  // Restore saved language, else follow the browser preference on first visit
+  // Default to English; only switch to Turkish if the user previously chose it
   (function(){
     var saved=null; try { saved = localStorage.getItem('gravita_lang'); } catch(_) {}
-    if (!saved) { saved = (navigator.language||'').toLowerCase().indexOf('tr')===0 ? 'tr' : 'en'; }
     if (saved === 'tr') setLang('tr');
   })();
   // Form submit intercept
