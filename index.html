@@ -137,7 +137,7 @@
   .hamburger span { display: block; width: 24px; height: 2px; background: #fff; }
 
   /* ===================== HERO (BLUEPRINT) ===================== */
-  #hero { position: relative; min-height: 100vh; background: var(--paper); padding-top: 78px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+  #hero { position: relative; min-height: 100vh; min-height: 100svh; background: var(--paper); padding-top: 78px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
   .bp-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--grid-ink) 1px, transparent 1px), linear-gradient(90deg, var(--grid-ink) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; }
   .bp-grid-lg { position: absolute; inset: 0; background-image: linear-gradient(var(--grid-ink-lg) 1px, transparent 1px), linear-gradient(90deg, var(--grid-ink-lg) 1px, transparent 1px); background-size: 200px 200px; z-index: 0; }
   .reg { position: absolute; z-index: 4; width: 16px; height: 16px; }
@@ -898,11 +898,20 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <span class="footer-copy" data-lang="en">© 2026 GRAVITA Engineering Co. Ltd. All rights reserved.</span>
-    <span class="footer-copy" data-lang="tr">© 2026 GRAVITA Mühendislik Ltd. Şti. Tüm hakları saklıdır.</span>
+    <span class="footer-copy" data-lang="en">© <span class="yr">2026</span> GRAVITA Engineering Co. Ltd. All rights reserved.</span>
+    <span class="footer-copy" data-lang="tr">© <span class="yr">2026</span> GRAVITA Mühendislik Ltd. Şti. Tüm hakları saklıdır.</span>
     <a class="footer-tagline" href="https://www.gravita.com.tr" aria-label="gravita.com.tr">gravita.com.tr</a>
   </div>
 </footer>
+
+<script>
+  // Auto copyright year: shows founding year, or "2026–YYYY" range once time moves on
+  (function(){
+    var founded = 2026, now = new Date().getFullYear();
+    var txt = now > founded ? (founded + '\u2013' + now) : String(founded);
+    document.querySelectorAll('.footer-copy .yr').forEach(function(el){ el.textContent = txt; });
+  })();
+</script>
 
 <script>
   function setLang(lang) {
@@ -994,8 +1003,10 @@
     }
     // safety: never leave content hidden
     setTimeout(function(){ els.forEach(reveal); }, 2500);
-    // also reveal on scroll as a fallback
-    window.addEventListener('scroll', function(){ els.forEach(function(el){ if (!el.classList.contains('visible') && inView(el)) reveal(el); }); }, { passive: true });
+    // scroll fallback only where IntersectionObserver is unavailable
+    if (!('IntersectionObserver' in window)) {
+      window.addEventListener('scroll', function(){ els.forEach(function(el){ if (!el.classList.contains('visible') && inView(el)) reveal(el); }); }, { passive: true });
+    }
   })();
 </script>
 <script>
@@ -1106,7 +1117,19 @@
         ctx.fillStyle = depth>0 ? 'rgba(154,53,118,'+(0.55+0.4*front).toFixed(3)+')' : 'rgba(68,52,89,'+(0.3*a).toFixed(3)+')';
         ctx.globalAlpha=a; ctx.beginPath(); ctx.arc(rp[i*3],rp[i*3+1],rr,0,2*Math.PI); ctx.fill(); ctx.globalAlpha=1;
       }
-      requestAnimationFrame(frame);
+    }
+    // pause the loop when the tab is hidden or the canvas is scrolled off-screen (saves CPU/battery, esp. mobile)
+    var running=false, pageVisible=!document.hidden, inViewport=true;
+    function tick(now){ if(!running) return; frame(now); rafId=requestAnimationFrame(tick); }
+    var rafId=null;
+    function updateRunning(){
+      var should = pageVisible && inViewport;
+      if (should && !running){ running=true; lastT=performance.now()/1000; rafId=requestAnimationFrame(tick); }
+      else if (!should && running){ running=false; if(rafId) cancelAnimationFrame(rafId); rafId=null; }
+    }
+    document.addEventListener('visibilitychange', function(){ pageVisible=!document.hidden; updateRunning(); });
+    if (window.IntersectionObserver){
+      new IntersectionObserver(function(en){ inViewport=en[0].isIntersecting; updateRunning(); }, { threshold: 0 }).observe(canvas);
     }
     canvas.addEventListener('pointerdown',function(e){ dragging=true; lastX=e.clientX; canvas.classList.add('dragging'); try{canvas.setPointerCapture(e.pointerId);}catch(_){} e.preventDefault(); });
     canvas.addEventListener('pointermove',function(e){ if(!dragging) return; var dx=e.clientX-lastX; lastX=e.clientX; spin+=dx*0.011; spinVel=Math.max(-3,Math.min(3,dx*0.5)); });
@@ -1115,7 +1138,7 @@
     if(window.ResizeObserver){ new ResizeObserver(resize).observe(canvas); }
     window.addEventListener('resize',resize);
     resize();
-    requestAnimationFrame(frame);
+    updateRunning();
   })();
 </script>
 </body>
