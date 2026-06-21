@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://formspree.io; form-action https://formspree.io; base-uri 'self'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="#15101c">
 <title>GRAVITA Engineering Co. Ltd. — Structural, Mechanical & Earthquake Engineering</title>
 
 <!-- SEO -->
@@ -258,6 +261,10 @@
   .form-input, .form-textarea { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.22); padding: 13px 16px; color: #fff; font-family: var(--body); font-size: 15px; outline: none; transition: border-color 0.2s, background 0.2s; }
   .form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.32); }
   .form-input:focus, .form-textarea:focus { border-color: var(--magenta-soft); background: rgba(255,255,255,0.09); }
+  /* Keyboard focus visibility (a11y) */
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--magenta-bright); outline-offset: 2px; border-radius: 1px; }
+  .skip-link { position: absolute; left: 12px; top: -48px; z-index: 999; background: var(--magenta-bright); color: #fff; padding: 10px 16px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-decoration: none; transition: top 0.18s ease; }
+  .skip-link:focus { top: 12px; }
   .form-textarea { height: 120px; resize: vertical; }
   .form-submit { width: 100%; padding: 15px; background: var(--magenta-bright); color: #fff; font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s; }
   .form-submit:hover { background: #a3366a; }
@@ -330,6 +337,8 @@
   </style>
 </head>
 <body>
+
+<a class="skip-link" href="#hero"><span data-lang="en">Skip to content</span><span data-lang="tr">İçeriğe geç</span></a>
 
 <nav>
   <div class="nav-inner">
@@ -427,27 +436,27 @@
       <li><a href="#services" data-lang="en">Services</a><a href="#services" data-lang="tr">HİZMETLER</a></li>
       <li style="border-bottom:none;">
         <div class="lang-toggle-mobile">
-          <button id="btnEN_m" class="active" onclick="setLang('en')">EN</button>
+          <button id="btnEN_m" class="active" onclick="setLang('en')" aria-pressed="true" aria-label="English">EN</button>
           <div class="sep"></div>
-          <button id="btnTR_m" onclick="setLang('tr')">TR</button>
+          <button id="btnTR_m" onclick="setLang('tr')" aria-pressed="false" aria-label="Türkçe">TR</button>
         </div>
       </li>
     </ul>
 
     <div class="nav-right">
       <div class="lang-toggle">
-        <button id="btnEN" class="active" onclick="setLang('en')">EN</button>
+        <button id="btnEN" class="active" onclick="setLang('en')" aria-pressed="true" aria-label="English">EN</button>
         <div class="sep"></div>
-        <button id="btnTR" onclick="setLang('tr')">TR</button>
+        <button id="btnTR" onclick="setLang('tr')" aria-pressed="false" aria-label="Türkçe">TR</button>
       </div>
       <a href="#contact" class="nav-cta" id="navCta">Contact</a>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
 
 <!-- HERO -->
-<section id="hero">
+<section id="hero" role="main" tabindex="-1" style="outline:none;">
   <div class="bp-grid"></div>
   <div class="bp-grid-lg"></div>
   <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
@@ -849,26 +858,35 @@
       </div>
       <div>
       <form action="https://formspree.io/f/mzdwlbep" method="POST" id="contactForm">
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
         <div class="form-group">
-          <label class="form-label" data-lang="en">Full Name</label><label class="form-label" data-lang="tr">AD SOYAD</label>
-          <input type="text" name="name" class="form-input" placeholder="—" required>
+          <label class="form-label" for="f_name" data-lang="en">Full Name</label><label class="form-label" for="f_name" data-lang="tr">AD SOYAD</label>
+          <input type="text" id="f_name" name="name" class="form-input" placeholder="—" autocomplete="name" maxlength="120" required>
         </div>
         <div class="form-group">
-          <label class="form-label" data-lang="en">Company</label><label class="form-label" data-lang="tr">ŞİRKET</label>
-          <input type="text" name="company" class="form-input" placeholder="—">
+          <label class="form-label" for="f_company" data-lang="en">Company</label><label class="form-label" for="f_company" data-lang="tr">ŞİRKET</label>
+          <input type="text" id="f_company" name="company" class="form-input" placeholder="—" autocomplete="organization" maxlength="120">
         </div>
         <div class="form-group">
-          <label class="form-label" data-lang="en">Email</label><label class="form-label" data-lang="tr">E-POSTA</label>
-          <input type="email" name="email" class="form-input" placeholder="—" required>
+          <label class="form-label" for="f_email" data-lang="en">Email</label><label class="form-label" for="f_email" data-lang="tr">E-POSTA</label>
+          <input type="email" id="f_email" name="email" class="form-input" placeholder="—" autocomplete="email" maxlength="160" required>
         </div>
         <div class="form-group">
-          <label class="form-label" data-lang="en">Message</label><label class="form-label" data-lang="tr">MESAJ</label>
-          <textarea name="message" class="form-textarea" placeholder="—" required></textarea>
+          <label class="form-label" for="f_message" data-lang="en">Message</label><label class="form-label" for="f_message" data-lang="tr">MESAJ</label>
+          <textarea id="f_message" name="message" class="form-textarea" placeholder="—" maxlength="4000" required></textarea>
+        </div>
+        <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;">
+          <input type="checkbox" name="consent" id="formConsent" required style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:#903373;">
+          <label for="formConsent" style="font-size:12px;line-height:1.5;color:rgba(255,255,255,0.65);font-weight:400;letter-spacing:0;text-transform:none;">
+            <span data-lang="en">I consent to GRAVITA processing the personal data I provide solely to respond to my inquiry, in accordance with the KVKK (Law No. 6698) and the GDPR.</span>
+            <span data-lang="tr">Sağladığım kişisel verilerin, yalnızca talebime yanıt verilmesi amacıyla KVKK (6698 sayılı Kanun) ve GDPR kapsamında GRAVITA tarafından işlenmesine onay veriyorum.</span>
+          </label>
         </div>
         <button type="submit" class="form-submit" id="formSubmitBtn">
           <span data-lang="en">Send Message</span><span data-lang="tr">MESAJ GÖNDER</span>
         </button>
         <p id="formSuccess" style="display:none;color:rgba(255,255,255,0.8);margin-top:16px;font-size:14px;">✓ <span id="formSuccessText">Message sent successfully!</span></p>
+        <p id="formError" role="alert" style="display:none;color:#ffb4b4;margin-top:14px;font-size:14px;"><span data-lang="en">There was a problem sending your message. Please try again.</span><span data-lang="tr">Mesajınız gönderilirken bir sorun oluştu. Lütfen tekrar deneyin.</span></p>
       </form>
       </div>
     </div>
@@ -888,25 +906,34 @@
 
 <script>
   function setLang(lang) {
+    lang = (lang === 'tr') ? 'tr' : 'en';
     document.body.classList.toggle('lang-tr', lang === 'tr');
-    document.documentElement.lang = lang === 'tr' ? 'tr' : 'en';
-    document.getElementById('btnEN').classList.toggle('active', lang === 'en');
-    document.getElementById('btnTR').classList.toggle('active', lang === 'tr');
-    var mEN = document.getElementById('btnEN_m');
-    var mTR = document.getElementById('btnTR_m');
-    if (mEN) mEN.classList.toggle('active', lang === 'en');
-    if (mTR) mTR.classList.toggle('active', lang === 'tr');
+    document.documentElement.lang = lang;
+    var en = lang === 'en', tr = lang === 'tr';
+    ['btnEN','btnEN_m'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.classList.toggle('active', en); b.setAttribute('aria-pressed', String(en)); } });
+    ['btnTR','btnTR_m'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.classList.toggle('active', tr); b.setAttribute('aria-pressed', String(tr)); } });
     var cta = document.getElementById('navCta');
-    if (cta) cta.textContent = lang === 'tr' ? 'İLETİŞİM' : 'Contact';
+    if (cta) cta.textContent = tr ? 'İLETİŞİM' : 'Contact';
     var st = document.getElementById('formSuccessText');
-    if (st) st.textContent = lang === 'tr' ? 'Mesajınız gönderildi!' : 'Message sent successfully!';
+    if (st) st.textContent = tr ? 'Mesajınız gönderildi!' : 'Message sent successfully!';
+    try { localStorage.setItem('gravita_lang', lang); } catch(_) {}
   }
+  // Restore saved language, else follow the browser preference on first visit
+  (function(){
+    var saved=null; try { saved = localStorage.getItem('gravita_lang'); } catch(_) {}
+    if (!saved) { saved = (navigator.language||'').toLowerCase().indexOf('tr')===0 ? 'tr' : 'en'; }
+    if (saved === 'tr') setLang('tr');
+  })();
   // Form submit intercept
   var cf = document.getElementById('contactForm');
   if (cf) {
     cf.addEventListener('submit', function(e) {
       e.preventDefault();
       var btn = document.getElementById('formSubmitBtn');
+      var errEl = document.getElementById('formError');
+      var okEl = document.getElementById('formSuccess');
+      if (errEl) errEl.style.display = 'none';
+      if (okEl) okEl.style.display = 'none';
       if (btn) btn.disabled = true;
       fetch(cf.action, {
         method: 'POST',
@@ -915,14 +942,13 @@
       }).then(function(r) {
         if (r.ok) {
           cf.reset();
-          var s = document.getElementById('formSuccess');
-          if (s) s.style.display = 'block';
-        } else {
-          alert('There was a problem sending your message. Please try again.');
+          if (okEl) okEl.style.display = 'block';
+        } else if (errEl) {
+          errEl.style.display = 'block';
         }
         if (btn) btn.disabled = false;
       }).catch(function() {
-        alert('There was a problem sending your message. Please try again.');
+        if (errEl) errEl.style.display = 'block';
         if (btn) btn.disabled = false;
       });
     });
@@ -939,16 +965,19 @@
     });
   }
 
-  document.getElementById('hamburger').addEventListener('click', function() {
+  var hamburgerBtn = document.getElementById('hamburger');
+  function closeMenu(){ var nl=document.getElementById('navLinks'); nl.classList.remove('open'); document.body.style.overflow=''; if(hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded','false'); }
+  hamburgerBtn.addEventListener('click', function() {
     var nl = document.getElementById('navLinks');
-    nl.classList.toggle('open');
-    document.body.style.overflow = nl.classList.contains('open') ? 'hidden' : '';
+    var open = nl.classList.toggle('open');
+    document.body.style.overflow = open ? 'hidden' : '';
+    hamburgerBtn.setAttribute('aria-expanded', String(open));
   });
-  document.querySelectorAll('#navLinks a').forEach(a => {
-    a.addEventListener('click', () => {
-      document.getElementById('navLinks').classList.remove('open');
-      document.body.style.overflow = '';
-    });
+  document.querySelectorAll('#navLinks a').forEach(function(a){
+    a.addEventListener('click', closeMenu);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && document.getElementById('navLinks').classList.contains('open')) { closeMenu(); hamburgerBtn.focus(); }
   });
   (function(){
     var els = [].slice.call(document.querySelectorAll('.reveal'));
@@ -972,9 +1001,10 @@
 </script>
 <script>
   (function(){
+    var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function animate(el){
       var to = parseInt(el.getAttribute('data-to'),10);
-      if (el.hasAttribute('data-plain')){ el.textContent = to; return; }
+      if (reducedMotion || el.hasAttribute('data-plain')){ el.textContent = to; return; }
       var start = null, dur = 1400;
       function step(ts){
         if(!start) start = ts;
@@ -1033,7 +1063,8 @@
     var start=lastT+0.3, DUR=1.6, STAG=1.1, TILT=-16*Math.PI/180;
     var IDLE=reduced?0:0.12, spin=0, spinVel=IDLE, dragging=false, lastX=0;
     function easeInOut(x){ return x<=0?0:x>=1?1:x*x*x*(x*(x*6-15)+10); }
-    var rp=new Float64Array(N*3), sc=new Float64Array(N), al=new Float64Array(N);
+    var rp=new Float64Array(N*3), al=new Float64Array(N);
+    var order=[]; for(var oi=0;oi<N;oi++) order.push(oi);
     function frame(now){
       var t=now/1000, dt=Math.min(0.05,t-lastT); lastT=t;
       if(!dragging) spinVel += (IDLE-spinVel)*Math.min(1,dt*1.5);
@@ -1051,8 +1082,7 @@
         var rx=x*cs+z*ss, rz=-x*ss+z*cs, ry=y;
         var fx=rx, fy=ry*ct-rz*st, fz=ry*st+rz*ct;
         rp[i*3]=cx+fx*Rs; rp[i*3+1]=cy-fy*Rs; rp[i*3+2]=fz;
-        sc[i]=sc[i]; al[i]=Math.min(1,lt*1.8);
-        sc[i]=fz; // store depth for shading
+        al[i]=Math.min(1,lt*1.8);
       }
       // links (draw under nodes)
       for(var k=0;k<links.length;k++){
@@ -1064,11 +1094,10 @@
         ctx.lineWidth=depth>0?1:0.7;
         ctx.beginPath(); ctx.moveTo(rp[ia*3],rp[ia*3+1]); ctx.lineTo(rp[ib*3],rp[ib*3+1]); ctx.stroke();
       }
-      // nodes (sorted back-to-front)
-      var idx=[]; for(i=0;i<N;i++) idx.push(i);
-      idx.sort(function(p,q){ return rp[p*3+2]-rp[q*3+2]; });
+      // nodes (sorted back-to-front; reuse a hoisted index array each frame)
+      order.sort(function(p,q){ return rp[p*3+2]-rp[q*3+2]; });
       for(var j=0;j<N;j++){
-        i=idx[j]; var a=al[i]; if(a<=0.02) continue;
+        i=order[j]; var a=al[i]; if(a<=0.02) continue;
         var depth=rp[i*3+2], front=depth*0.5+0.5;
         var rr=nodes[i].r*(0.7+0.5*front);
         // halo
