@@ -1214,5 +1214,26 @@
   document.addEventListener('keydown', function(e){ if(e.key==='Escape' && modal.classList.contains('open')) closeM(); });
 })();
 </script>
+<script>
+/* Localised form validation messages (browser defaults follow the browser language, not the site language) */
+(function(){
+  var M={
+    tr:{name:'Lütfen adınızı ve soyadınızı girin.',email:'Lütfen e-posta adresinizi girin.',emailBad:'Lütfen geçerli bir e-posta adresi girin.',message:'Lütfen mesajınızı yazın.',consent:'Devam etmek için lütfen bu kutuyu işaretleyin.'},
+    en:{name:'Please enter your name.',email:'Please enter your email address.',emailBad:'Please enter a valid email address.',message:'Please enter your message.',consent:'Please check this box to continue.'}
+  };
+  var map={f_name:'name',f_email:'email',f_message:'message',formConsent:'consent'};
+  function lang(){ return document.body.classList.contains('lang-tr')?'tr':'en'; }
+  Object.keys(map).forEach(function(id){
+    var el=document.getElementById(id); if(!el) return;
+    el.addEventListener('invalid', function(){
+      var m=M[lang()];
+      el.setCustomValidity('');
+      if(el.validity.valueMissing) el.setCustomValidity(m[map[id]]);
+      else if(el.validity.typeMismatch) el.setCustomValidity(m.emailBad);
+    });
+    ['input','change'].forEach(function(ev){ el.addEventListener(ev, function(){ el.setCustomValidity(''); }); });
+  });
+})();
+</script>
 </body>
 </html>
