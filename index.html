@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://formspree.io; form-action https://formspree.io; base-uri 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://formspree.io; form-action https://formspree.io; frame-src https://www.google.com; base-uri 'self'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="theme-color" content="#ffffff">
 <title>GRAVITA Engineering Co. Ltd. — Structural, Mechanical & Earthquake Engineering</title>
@@ -373,6 +373,18 @@
   .privacy-close:hover { color: #903373; }
   @media (max-width: 600px) { .privacy-box { padding: 28px 20px 24px; max-height: 90vh; } }
   /* ===== END PRIVACY NOTICE MODAL ===== */
+
+  /* ===== MAP (click to load) ===== */
+  .map-wrap { margin-top: -4px; margin-bottom: 8px; }
+  .map-box { position: relative; width: 100%; height: 230px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .map-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .map-load { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px; text-align: center; }
+  .map-load button { padding: 10px 20px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.45); font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+  .map-load button:hover { background: var(--magenta-bright); border-color: var(--magenta-bright); }
+  .map-note { font-size: 11px; line-height: 1.5; color: rgba(255,255,255,0.5); max-width: 340px; }
+  .map-link { display: inline-block; margin-top: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; color: var(--magenta-soft); text-decoration: none; }
+  .map-link:hover { color: #fff; }
+  /* ===== END MAP ===== */
   </style>
 </head>
 <body>
@@ -894,6 +906,15 @@
           <span class="contact-detail-label" data-lang="en">Address</span><span class="contact-detail-label" data-lang="tr">ADRES</span>
           <span class="contact-detail-val">Konutkent Mahallesi 3028. Cadde No:6 Kat:31<br>06810 Çankaya / Ankara — TÜRKİYE</span>
         </div>
+        <div class="map-wrap">
+          <div class="map-box" id="mapBox">
+            <div class="map-load" id="mapLoad">
+              <button type="button" id="mapBtn"><span data-lang="en">SHOW MAP</span><span data-lang="tr">HARİTAYI GÖSTER</span></button>
+              <p class="map-note"><span data-lang="en">Loading the map connects to Google Maps, which may set cookies.</span><span data-lang="tr">Haritayı yüklemek Google Haritalar'a bağlanır ve çerez bırakabilir.</span></p>
+            </div>
+          </div>
+          <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Konutkent%20Mahallesi%203028.%20Cadde%20No%3A6%2C%2006810%20%C3%87ankaya%2C%20Ankara%2C%20T%C3%BCrkiye" target="_blank" rel="noopener noreferrer"><span data-lang="en">OPEN IN GOOGLE MAPS &rarr;</span><span data-lang="tr">GOOGLE HARİTALAR'DA AÇ &rarr;</span></a>
+        </div>
         <div class="contact-tagline">
           <p class="tagline-slogan" data-lang="en">"Solid ground for great ideas."</p>
           <p class="tagline-slogan" data-lang="tr">"Büyük fikirler için sağlam zemin."</p>
@@ -1250,6 +1271,19 @@
       else if(el.validity.typeMismatch) el.setCustomValidity(m.emailBad);
     });
     ['input','change'].forEach(function(ev){ el.addEventListener(ev, function(){ el.setCustomValidity(''); }); });
+  });
+})();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('mapBtn'), box=document.getElementById('mapBox'), load=document.getElementById('mapLoad');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var f=document.createElement('iframe');
+    f.src='https://www.google.com/maps?q=Konutkent%20Mahallesi%203028.%20Cadde%20No%3A6%2C%2006810%20%C3%87ankaya%2C%20Ankara%2C%20T%C3%BCrkiye&output=embed';
+    f.title='GRAVITA — Google Maps';
+    f.loading='lazy'; f.referrerPolicy='no-referrer-when-downgrade'; f.setAttribute('allowfullscreen','');
+    box.appendChild(f); if(load) load.style.display='none';
   });
 })();
 </script>
