@@ -353,6 +353,20 @@
     .nav-links a { border-bottom-color: rgba(68,52,89,0.12) !important; }
   }
   /* ===== END NAV WHITE EXPERIMENT ===== */
+
+  /* ===== PRIVACY NOTICE MODAL ===== */
+  .privacy-link { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+  .privacy-link:hover { color: #e58bc2; }
+  .privacy-modal { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(30,22,44,0.72); }
+  .privacy-modal.open { display: flex; }
+  .privacy-box { position: relative; background: #fff; color: #2a2236; width: 100%; max-width: 720px; max-height: 86vh; overflow-y: auto; padding: 36px 40px 32px; border-top: 3px solid #903373; font-size: 14px; line-height: 1.6; }
+  .privacy-box h2 { font-family: var(--disp); font-size: 22px; line-height: 1.25; color: #443459; margin-bottom: 14px; padding-right: 36px; }
+  .privacy-box p { margin: 0 0 12px; }
+  .privacy-box strong { color: #443459; }
+  .privacy-close { position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; background: none; border: none; cursor: pointer; font-size: 26px; line-height: 1; color: #443459; }
+  .privacy-close:hover { color: #903373; }
+  @media (max-width: 600px) { .privacy-box { padding: 28px 20px 24px; max-height: 90vh; } }
+  /* ===== END PRIVACY NOTICE MODAL ===== */
   </style>
 </head>
 <body>
@@ -897,8 +911,8 @@
         <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;">
           <input type="checkbox" name="consent" id="formConsent" required style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:#903373;">
           <label for="formConsent" style="font-size:12px;line-height:1.5;color:rgba(255,255,255,0.65);font-weight:400;letter-spacing:0;text-transform:none;">
-            <span data-lang="en">I consent to GRAVITA processing the personal data I provide solely to respond to my inquiry, in accordance with the KVKK (Law No. 6698) and the GDPR.</span>
-            <span data-lang="tr">Sağladığım kişisel verilerin, yalnızca talebime yanıt verilmesi amacıyla KVKK (6698 sayılı Kanun) ve GDPR kapsamında GRAVITA tarafından işlenmesine onay veriyorum.</span>
+            <span data-lang="en">I consent to GRAVITA processing the personal data I provide solely to respond to my inquiry, in accordance with the KVKK (Law No. 6698). <a href="#" class="privacy-link" data-privacy-open>Privacy Notice</a></span>
+            <span data-lang="tr">Sağladığım kişisel verilerin, yalnızca talebime yanıt verilmesi amacıyla KVKK (6698 sayılı Kanun) kapsamında GRAVITA tarafından işlenmesine onay veriyorum. <a href="#" class="privacy-link" data-privacy-open>Aydınlatma Metni</a></span>
           </label>
         </div>
         <button type="submit" class="form-submit" id="formSubmitBtn">
@@ -1159,6 +1173,46 @@
     resize();
     updateRunning();
   })();
+</script>
+
+<!-- PRIVACY NOTICE MODAL -->
+<div class="privacy-modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle" aria-hidden="true">
+  <div class="privacy-box" id="privacyBox" tabindex="-1">
+    <button type="button" class="privacy-close" id="privacyClose" aria-label="Close">&times;</button>
+    <div data-lang="en"><h2>Privacy Notice (KVKK)</h2>
+<p>In accordance with Law No. 6698 on the Protection of Personal Data ("KVKK") Art. 10, we provide the following information.</p>
+<p><strong>Data controller:</strong> GRAVITA Mühendislik Ltd. Şti. ("GRAVITA"), Konutkent Mahallesi 3028. Cadde No:6 Kat:31, 06810 Çankaya / Ankara, Türkiye. Mersis No: 0411123695300001. Email: info@gravita.com.tr.</p>
+<p><strong>Data processed:</strong> Name, email address, company and message content you provide through the contact form on our website.</p>
+<p><strong>Purpose:</strong> To evaluate and respond to your enquiries and requests and to communicate with you.</p>
+<p><strong>Legal basis:</strong> Steps taken at your request prior to entering into a contract and our legitimate interest in responding to enquiries (KVKK Art. 5/2).</p>
+<p><strong>Method of collection:</strong> The contact form on our website (automated, electronic).</p>
+<p><strong>Recipients and transfers:</strong> The data you share in the form is delivered to GRAVITA by email. We do not share your data with third parties unless legally required.</p>
+<p><strong>Retention:</strong> Your data is retained for 180 days from the conclusion of your request, and then deleted or anonymised. If your request leads to a contract, the retention periods required by the relevant legislation apply.</p>
+<p><strong>Your rights:</strong> Under KVKK Art. 11, you may request information on whether your data is processed, access it, request correction or deletion, object to processing, and request compensation for damages arising from unlawful processing. You may also lodge a complaint with the Turkish Personal Data Protection Authority (KVKK).</p>
+<p><strong>Contact:</strong> info@gravita.com.tr</p></div>
+    <div data-lang="tr"><h2>Kişisel Verilerin Korunması Hakkında Aydınlatma Metni</h2>
+<p>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") m.10 uyarınca, kişisel verilerinizin işlenmesine ilişkin olarak aşağıdaki bilgileri sunarız.</p>
+<p><strong>Veri sorumlusu:</strong> GRAVITA Mühendislik Ltd. Şti. ("GRAVITA"), Konutkent Mahallesi 3028. Cadde No:6 Kat:31, 06810 Çankaya / Ankara, Türkiye. Mersis No: 0411123695300001. E-posta: info@gravita.com.tr.</p>
+<p><strong>İşlenen kişisel veriler:</strong> Web sitemizdeki iletişim formunda paylaştığınız ad soyad, e-posta adresi, şirket bilgisi ve mesaj içeriği.</p>
+<p><strong>İşleme amacı:</strong> Talep, soru ve tekliflerinizi değerlendirmek, size yanıt vermek ve iletişim kurmak.</p>
+<p><strong>Hukuki sebep:</strong> KVKK m.5/2-c (bir sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması), m.5/2-f (veri sorumlusunun meşru menfaati) ve talebinizin yanıtlanması.</p>
+<p><strong>Toplama yöntemi:</strong> İnternet sitemizdeki iletişim formu (otomatik, elektronik ortam).</p>
+<p><strong>Aktarım:</strong> Formda paylaştığınız veriler e-posta ile GRAVITA'ya iletilir. Verileriniz, yasal zorunluluk bulunmadıkça üçüncü kişilerle paylaşılmaz.</p>
+<p><strong>Saklama süresi:</strong> Verileriniz, talebinizin sonuçlanmasından itibaren 180 gün saklanır, ardından silinir veya anonim hale getirilir. Talebiniz bir sözleşmeye dönüşürse ilgili mevzuatın öngördüğü süreler uygulanır.</p>
+<p><strong>Haklarınız (KVKK m.11):</strong> Kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, işlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme, yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme, eksik veya yanlış işlenmişse düzeltilmesini isteme, silinmesini veya yok edilmesini isteme, bu işlemlerin aktarıldığı üçüncü kişilere bildirilmesini isteme, işlenen verilerin analizi sonucu aleyhinize bir sonuç doğmasına itiraz etme, kanuna aykırı işleme nedeniyle zarara uğramanız halinde zararın giderilmesini talep etme haklarına sahipsiniz.</p>
+<p><strong>Başvuru:</strong> Haklarınıza ilişkin taleplerinizi info@gravita.com.tr adresine iletebilirsiniz.</p></div>
+  </div>
+</div>
+<script>
+(function(){
+  var modal=document.getElementById('privacyModal'), box=document.getElementById('privacyBox'), lastFocus=null;
+  function openM(e){ if(e) e.preventDefault(); lastFocus=document.activeElement; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; box.scrollTop=0; box.focus(); }
+  function closeM(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; if(lastFocus&&lastFocus.focus) lastFocus.focus(); }
+  document.querySelectorAll('[data-privacy-open]').forEach(function(a){ a.addEventListener('click', openM); });
+  document.getElementById('privacyClose').addEventListener('click', closeM);
+  modal.addEventListener('click', function(e){ if(e.target===modal) closeM(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && modal.classList.contains('open')) closeM(); });
+})();
 </script>
 </body>
 </html>
