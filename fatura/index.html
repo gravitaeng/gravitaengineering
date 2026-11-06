@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fatura Bilgileri · Gravita Mühendislik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --plum:#44345a; --plum-deep:#15101c; --magenta:#9a3576; --magenta-bright:#c0457a; --ink:#1a1424; --ink-soft:#564d60; --ink-faint:#8b8392; --paper-2:#f4f2ee; --line:#ccc6cf; --ok:#2f7d4f; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Inter',sans-serif; background:var(--paper-2); color:var(--ink); -webkit-font-smoothing:antialiased; min-height:100vh; }
+  header { background:var(--plum-deep); padding:18px 16px; }
+  .brand { max-width:560px; margin:0 auto; display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .brand b { font-family:Arial,Helvetica,sans-serif; font-size:24px; font-weight:700; color:#fff; letter-spacing:.01em; }
+  .brand i { font-style:normal; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:700; color:rgba(255,255,255,.5); letter-spacing:.04em; border-left:1px solid rgba(255,255,255,.3); padding-left:10px; line-height:1.35; }
+  main { max-width:560px; margin:0 auto; padding:28px 16px 40px; }
+  .kicker { font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--magenta); }
+  h1 { font-family:'Hanken Grotesk',sans-serif; font-size:28px; font-weight:700; margin:6px 0 6px; color:var(--plum-deep); }
+  .sub { color:var(--ink-soft); font-size:14px; margin-bottom:20px; }
+  .card { background:#fff; border:1px solid var(--line); }
+  .row { display:flex; align-items:center; gap:12px; padding:14px 14px 14px 16px; border-bottom:1px solid var(--line); }
+  .row:last-child { border-bottom:0; }
+  .txt { flex:1; min-width:0; }
+  .lbl { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:3px; }
+  .val { font-weight:600; font-size:15.5px; line-height:1.35; overflow-wrap:anywhere; }
+  button { font:inherit; cursor:pointer; }
+  .copy { flex-shrink:0; min-width:92px; padding:10px 12px; background:var(--plum); color:#fff; border:1px solid var(--plum); font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; transition:background .15s; }
+  .copy:active { background:var(--plum-deep); }
+  .copy.done { background:var(--ok); border-color:var(--ok); }
+  .all { display:block; width:100%; margin-top:14px; padding:15px; background:var(--magenta-bright); color:#fff; border:0; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .all.done { background:var(--ok); }
+  .foot { margin-top:22px; text-align:center; font-size:13px; color:var(--ink-faint); }
+  .foot a { color:var(--magenta); }
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="/">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 28" width="27" height="40" style="display:block;flex-shrink:0;">
+        <rect x="0" y="0" width="14" height="1" fill="#903373"/>
+        <rect x="0" y="1" width="14" height="1" fill="#903373"/>
+        <rect x="0" y="2" width="2" height="1" fill="#903373"/>
+        <rect x="12" y="2" width="2" height="1" fill="#903373"/>
+        <rect x="0" y="3" width="2" height="1" fill="#903373"/>
+        <rect x="12" y="3" width="2" height="1" fill="#903373"/>
+        <rect x="0" y="4" width="2" height="1" fill="#903373"/>
+        <rect x="12" y="4" width="2" height="1" fill="#903373"/>
+        <rect x="0" y="5" width="2" height="1" fill="#903373"/>
+        <rect x="0" y="6" width="2" height="1" fill="#903373"/>
+        <rect x="0" y="7" width="2" height="1" fill="#903373"/>
+        <rect x="0" y="8" width="2" height="1" fill="#903373"/>
+        <rect x="5" y="8" width="14" height="1" fill="#443459"/>
+        <rect x="0" y="9" width="2" height="1" fill="#903373"/>
+        <rect x="5" y="9" width="14" height="1" fill="#443459"/>
+        <rect x="0" y="10" width="2" height="1" fill="#903373"/>
+        <rect x="5" y="10" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="10" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="11" width="2" height="1" fill="#903373"/>
+        <rect x="5" y="11" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="11" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="12" width="2" height="1" fill="#903373"/>
+        <rect x="5" y="12" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="12" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="13" width="2" height="1" fill="#903373"/>
+        <rect x="17" y="13" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="14" width="2" height="1" fill="#903373"/>
+        <rect x="17" y="14" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="15" width="2" height="1" fill="#903373"/>
+        <rect x="11" y="15" width="2" height="1" fill="#903373"/>
+        <rect x="17" y="15" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="16" width="2" height="1" fill="#903373"/>
+        <rect x="11" y="16" width="2" height="1" fill="#903373"/>
+        <rect x="17" y="16" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="17" width="2" height="1" fill="#903373"/>
+        <rect x="11" y="17" width="2" height="1" fill="#903373"/>
+        <rect x="17" y="17" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="18" width="13" height="1" fill="#903373"/>
+        <rect x="17" y="18" width="2" height="1" fill="#443459"/>
+        <rect x="0" y="19" width="13" height="1" fill="#903373"/>
+        <rect x="17" y="19" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="20" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="21" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="22" width="2" height="1" fill="#443459"/>
+        <rect x="5" y="23" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="23" width="2" height="1" fill="#443459"/>
+        <rect x="5" y="24" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="24" width="2" height="1" fill="#443459"/>
+        <rect x="5" y="25" width="2" height="1" fill="#443459"/>
+        <rect x="17" y="25" width="2" height="1" fill="#443459"/>
+        <rect x="5" y="26" width="14" height="1" fill="#443459"/>
+        <rect x="5" y="27" width="14" height="1" fill="#443459"/>
+        <line x1="0" y1="0" x2="14" y2="0" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="2" y1="2" x2="12" y2="2" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="12" y1="5" x2="14" y2="5" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="5" y1="8" x2="19" y2="8" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="7" y1="10" x2="17" y2="10" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="5" y1="13" x2="7" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="11" y1="15" x2="13" y2="15" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="2" y1="18" x2="11" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="0" y1="20" x2="13" y2="20" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="5" y1="23" x2="7" y2="23" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="7" y1="26" x2="17" y2="26" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="5" y1="28" x2="19" y2="28" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="0" y1="0" x2="0" y2="20" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="2" y1="2" x2="2" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="5" y1="8" x2="5" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="5" y1="23" x2="5" y2="28" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="7" y1="10" x2="7" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="7" y1="23" x2="7" y2="26" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="11" y1="15" x2="11" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="12" y1="2" x2="12" y2="5" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="13" y1="15" x2="13" y2="20" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="14" y1="0" x2="14" y2="5" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="17" y1="10" x2="17" y2="26" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+        <line x1="19" y1="8" x2="19" y2="28" stroke="rgba(255,255,255,0.35)" stroke-width="0.15"/>
+      </svg>
+    <b>GRAVITA</b><i>ENGINEERING<br>MÜHENDİSLİK</i>
+  </a>
+</header>
+<main>
+  <div class="kicker">Fatura Kartı</div>
+  <h1>Fatura Bilgileri</h1>
+  <p class="sub">Kopyalamak istediğiniz bilginin yanındaki butona dokunun.</p>
+  <div class="card">
+      <div class="row">
+        <div class="txt"><div class="lbl">Ticari Ünvan</div><div class="val">GRAVITA MÜHENDİSLİK LİMİTED ŞİRKETİ</div></div>
+        <button class="copy" data-v="GRAVITA MÜHENDİSLİK LİMİTED ŞİRKETİ" aria-label="Ticari Ünvan kopyala"><span>Kopyala</span></button>
+      </div>
+      <div class="row">
+        <div class="txt"><div class="lbl">Firma Adresi</div><div class="val">KONUTKENT MAH. 3028 CADDE NO:6 İÇ KAPI NO:116 ÇANKAYA/ANKARA</div></div>
+        <button class="copy" data-v="KONUTKENT MAH. 3028 CADDE NO:6 İÇ KAPI NO:116 ÇANKAYA/ANKARA" aria-label="Firma Adresi kopyala"><span>Kopyala</span></button>
+      </div>
+      <div class="row">
+        <div class="txt"><div class="lbl">Vergi Dairesi</div><div class="val">DOĞANBEY</div></div>
+        <button class="copy" data-v="DOĞANBEY" aria-label="Vergi Dairesi kopyala"><span>Kopyala</span></button>
+      </div>
+      <div class="row">
+        <div class="txt"><div class="lbl">Vergi Kimlik No</div><div class="val">411 123 6953</div></div>
+        <button class="copy" data-v="4111236953" aria-label="Vergi Kimlik No kopyala"><span>Kopyala</span></button>
+      </div>
+      <div class="row">
+        <div class="txt"><div class="lbl">Web Adresi</div><div class="val">www.gravita.com.tr</div></div>
+        <button class="copy" data-v="www.gravita.com.tr" aria-label="Web Adresi kopyala"><span>Kopyala</span></button>
+      </div>
+      <div class="row">
+        <div class="txt"><div class="lbl">E-posta</div><div class="val">info@gravita.com.tr</div></div>
+        <button class="copy" data-v="info@gravita.com.tr" aria-label="E-posta kopyala"><span>Kopyala</span></button>
+      </div>
+  </div>
+  <button class="all" id="all">Tümünü Kopyala</button>
+  <p class="foot"><a href="/">www.gravita.com.tr</a></p>
+</main>
+<script>
+  function copyText(t) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t);
+    return new Promise(function (ok, no) {
+      var a = document.createElement('textarea'); a.value = t; a.setAttribute('readonly', '');
+      a.style.position = 'fixed'; a.style.opacity = '0'; document.body.appendChild(a); a.select();
+      try { document.execCommand('copy') ? ok() : no(); } catch (e) { no(e); } finally { document.body.removeChild(a); }
+    });
+  }
+  function flash(btn, label, orig) {
+    btn.classList.add('done'); btn.firstChild.textContent = label;
+    setTimeout(function () { btn.classList.remove('done'); btn.firstChild.textContent = orig; }, 1600);
+  }
+  document.querySelectorAll('.copy').forEach(function (b) {
+    b.addEventListener('click', function () {
+      copyText(b.dataset.v).then(function () { flash(b, 'Kopyalandı', 'Kopyala'); }, function () { flash(b, 'Hata', 'Kopyala'); });
+    });
+  });
+  var all = document.getElementById('all');
+  all.addEventListener('click', function () {
+    var t = Array.prototype.map.call(document.querySelectorAll('.row'), function (r) {
+      return r.querySelector('.lbl').textContent + ': ' + r.querySelector('.copy').dataset.v;
+    }).join('\n');
+    copyText(t).then(function () { all.classList.add('done'); all.textContent = 'Kopyalandı';
+      setTimeout(function () { all.classList.remove('done'); all.textContent = 'Tümünü Kopyala'; }, 1600); });
+  });
+</script>
+</body>
+</html>
